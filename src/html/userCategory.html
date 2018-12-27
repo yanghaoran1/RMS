@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>后台管理系统</title>
+    <link rel="stylesheet" href="../assets/layui/css/layui.css" media="all">
+    <script src="../assets/jquery-3.2.1.js"></script>
+    <script src="../assets/layui/layui.js" charset="utf-8"></script>
+    
+    <style>
+    </style>
+</head>
+
+<body class="layui-layout-body">
+    <div class="layui-layout layui-layout-admin">
+        <div class="layui-header">
+            <div class="layui-logo">后台管理系统</div>
+            <!-- 头部区域（可配合layui已有的水平导航） -->
+            <ul class="layui-nav layui-layout-left" style="margin-top: 20px;">
+                <span class="layui-breadcrumb">
+				  	<a href="../index.html">首页</a>
+                    <a href="javascript:;">用户管理</a>
+				  	<a href="javascript:;">用户列表</a>
+				</span>
+            </ul>
+
+            <ul class="layui-nav layui-layout-right">
+                <li class="layui-nav-item">
+                    <a href="javascript:;" id="username">
+			          <img src="http://t.cn/RCzsdCq" class="layui-nav-img">
+			          
+			        </a>
+                    <dl class="layui-nav-child">
+                        <dd><a href="">基本资料</a></dd>
+                        <dd><a href="">安全设置</a></dd>
+                    </dl>
+                </li>
+                <li class="layui-nav-item" id="output"><a href="">退了</a></li>
+            </ul>
+        </div>
+        <div class="layui-side layui-bg-black">
+            <div class="layui-side-scroll">
+                <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+                <ul class="layui-nav layui-nav-tree" lay-filter="test">
+                    <li class="layui-nav-item layui-nav-itemed">
+                        <a class="" href="javascript:;">商品管理</a>
+                        <dl class="layui-nav-child">
+                            <dd><a href="goodList.html">商品列表</a></dd>
+                            <dd><a href="goodsCategory.html">商品分类</a></dd>
+                            <dd><a href="AddGoods.html">添加商品</a></dd>
+                        </dl>
+                    </li>
+                    <li class="layui-nav-item">
+                        <a href="javascript:;">用户管理</a>
+                        <dl class="layui-nav-child">
+                            <dd><a href="userCategory.html">用户列表</a></dd>
+                            <dd><a href="addUser.html">添加用户</a></dd>
+                        </dl>
+                    </li>
+                    <li class="layui-nav-item">
+                        <a href="javascript:;">订单管理</a>
+                        <dl class="layui-nav-child">
+                            <dd><a href="order.html">订单列表</a></dd>
+                        </dl>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+
+
+        <div class="layui-body">
+            <!-- 内容主体区域 -->
+            <div style="padding: 15px;">
+                <table class="layui-hide" id="test" lay-filter="test"></table>
+                <script type="text/html" id="toolbarDemo">
+                    <div class="layui-btn-container">
+                      <button class="layui-btn layui-btn-sm" lay-event="add">添加</button>
+                      <button class="layui-btn layui-btn-sm" lay-event="delete">删除</button>
+                      
+                    </div>
+                  </script>
+
+                <script type="text/html" id="barDemo">
+                    <a class="layui-btn layui-btn-xs" lay-event="edit1">编辑</a>
+				  	<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+				</script>
+                <script>
+                    layui.use('table', function() {
+                        var table = layui.table;
+
+                        table.render({
+                            elem: '#test',
+                            url: 'user',
+                            toolbar: '#toolbarDemo',
+                            title: '用户数据表',
+                            page: true,
+                            id: 'testReload',
+                            // request: {
+                            //     pageName: 'curr', //页码的参数名称，默认：page
+                            //     limitName: 'nums' //每页数据量的参数名，默认：limit
+                            // },
+                            cols: [
+                                [
+                                    { type: 'checkbox', fixed: 'left'}, 
+                                    { field: 'username', title: '用户名', width: 80, fixed: 'left', unresize: true, sort: true },
+                                    // { field: 'username', title: '用户名', width: 100, edit: 'text' }, 
+                                    { field: 'usex', title: '性别', width: 100, edit: 'text', sort: true },
+                                    { field: 'uphone', title: '手机号码', width: 100 }, 
+                                    
+                                    {
+                                        field: 'uemail',
+                                        title: '邮箱',
+                                        width: 150,
+                                        edit: 'text',                                      
+                                    },                                 
+                                    // { field: 'experience', title: '积分', width: 80, sort: true }, 
+                                    { field: 'add_time', title: '加入时间', width: 120 }, 
+                                    { field: 'utext', title: '签名'}, 
+                                    { fixed: 'right', title: '操作', toolbar: '#barDemo', width: 150 }
+                                ]
+                            ]
+                        });       
+
+                        table.on('checkbox(demo)', function(obj){
+                            console.log(obj)
+                        });
+
+                        //监听行工具事件
+                        table.on('tool(test)', function(obj) {
+                            var data = obj.data;
+                            var username = $(this).parent().parent().parent().children().eq(1).children().html();                          
+                            // 删除单行
+                            if (obj.event === 'del') {
+                                layer.confirm('真的删除当行么', function(index) {
+                                    obj.del();                                                                      
+                                    layer.close(index);
+                                    $.ajax({
+                                        type:'delete',
+                                        url:'/html/user/'+username,
+                                        data:{
+                                            username:username
+                                        },
+                                        success:(data)=>{
+                                            console.log(data)
+                                            if(data.code == 0){
+                                                confirm('删除成功')
+                                            }else{
+                                                confirm('删除失败')
+                                            }
+                                        }
+                                        
+                                    });
+                                    
+                                });
+                            } else if (obj.event === 'edit1') {
+                               //编辑用户信息
+                                console.log(data.username)
+                            //点击编辑商品，跳转到编辑页面
+                            location.href = 'useralter.html?username=' + data.username;                                     
+                            }
+                        });
+
+
+                        var $ = layui.$, active = {
+                            reload: function(){
+                                var demoReload = $('#demoReload');                           
+                                //执行重载
+                                table.reload('testReload', {
+                                    page: {
+                                        curr: 1 //重新从第 1 页开始
+                                    }
+                                    ,where: {
+                                        key: {
+                                            id: demoReload.val()
+                                        }
+                                    } 
+                                });
+                            }
+                        };
+                        
+                        $('.demoTable .layui-btn').on('click', function(){
+                            var type = $(this).data('type');
+                            active[type] ? active[type].call(this) : '';
+                        });
+
+
+                         //监听头工具栏事件
+                        table.on('toolbar(test)', function(obj){
+                            var checkStatus = table.checkStatus(obj.config.id)
+                            ,data = checkStatus.data; //获取选中的数据
+                            switch(obj.event){
+                            case 'add':
+                                location.href = 'http://47.106.178.206:5005/html/addUser.html';
+                            break;
+                            case 'delete':
+                                if(data.length === 0){
+                                    layer.msg('请选择一888行');
+                                } else {    
+                                    
+                                    layer.confirm('真的删除这些行吗', function(index) {
+                                        var username = data.map(function(item){
+                                                return item.username;
+                                            });                                        
+                                            console.log(username)
+                                            for(var i=0;i<username.length;i++){
+                                                $.ajax({
+                                                    type:'delete',
+                                                    url:'/html/user/'+username[i],
+                                                    data:{
+                                                        username:username[i]
+                                                    },
+                                                    success:(data)=>{   
+                                                        if(data.code == 0){
+                                                            alert('删除成功')
+                                                        }
+                                                    }
+                                                    
+                                                });
+                                            }
+                                            layer.close(index);
+                                            location.reload();
+                                     });
+                                    
+                                    
+                                }
+                            break;
+                            };
+                        });
+
+                    });
+                    var storage=window.localStorage;
+                    var uu = document.querySelector('#username');
+                    if(storage.name){
+                        uu.innerHTML=storage.name;
+                    }else{
+                        location.href='http://47.106.178.206:5005/html/longin.html';
+                    }
+                    var outbtn = document.querySelector('#output')
+                    outbtn.onclick = function(){
+                        localStorage.removeItem('name');
+                    }
+                    var uu = document.querySelector('#username');
+                </script>
+            </div>
+        </div>
+
+
+        <div class="layui-footer">
+            <!-- 底部固定区域 -->
+            底部固定区域
+        </div>
+        
+
+        <script>
+            //JavaScript代码区域
+            layui.use('element', function() {
+                var element = layui.element; //导航的hover效果、二级菜单等功能，需要依赖element模块
+                //监听导航点击
+                element.on('nav(demo)', function(elem){
+                    // console.log(elem);
+                    layer.msg(elem.text());
+                });
+            });
+        </script>
+        
+</body>
+
+</html>
